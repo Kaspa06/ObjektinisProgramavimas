@@ -16,12 +16,12 @@ struct StudentasStruct {
     double vidurkis;
 } Studentai[100]; // Array to store information about up to 100 students
 
-// Function to check if a string represents a positive integer
+// Funckija tikrinti ar ivestas mok. skaicius yra teigiamas ir ar yra skaicius
 bool isPositiveInteger(const string& s) {
     return all_of(s.begin(), s.end(), ::isdigit) && stoi(s) > 0;
 }
 
-// Function to check if a string represents a valid double within a specified range
+// Funckija tikrinti ar egzamino rezultatas yra tarp 1.0 ir 10.0
 bool isValidDouble(const string& s, double minValue, double maxValue) {
     try {
         double value = stod(s);
@@ -31,12 +31,12 @@ bool isValidDouble(const string& s, double minValue, double maxValue) {
     }
 }
 
-// Function to check if a string represents a valid choice (1 or 2)
+// tikrinti ar nera klaidu ivesti tarp medianos ir vidurkio pasirinkimo
 bool isValidChoice(const string& s) {
     return s == "1" || s == "2";
 }
 
-// Function to check if a string represents a valid grade (1 to 10)
+// funkcija tikrinti ar ivesti pazymiai yra tarp 1 ir 10
 bool isValidGrade(const string& s) {
     if (all_of(s.begin(), s.end(), ::isdigit)) {
         int grade = stoi(s);
@@ -96,11 +96,9 @@ int main() {
                 sum += Studentai[i].nd[j];
             }
 
-            // Calculate average
-            Studentai[i].vidurkis = sum / static_cast<double>(Studentai[i].n);
+            Studentai[i].vidurkis = sum / (Studentai[i].n);
 
-            // Input validation for the exam result
-            string egzInput;
+            string egzInput; // paiimama ivestis kaip string'as ir tikrinamos salygos >=1 && <=10, ir ar tai yra sk;
             do {
                 cout << "Iveskite egzamino rezultata: ";
                 cin >> egzInput;
@@ -109,16 +107,13 @@ int main() {
                 }
             } while (!isValidDouble(egzInput, 1.0, 10.0));
 
-            Studentai[i].egz = stod(egzInput);
+            Studentai[i].egz = stod(egzInput); //string to double
 
-            // Calculate final grade using the old formula
             Studentai[i].galutinis = 0.4 * Studentai[i].vidurkis + 0.6 * Studentai[i].egz;
-
-            // Calculate final grade using the new formula
             Studentai[i].galutinisMed = 0.4 * ((Studentai[i].nd[Studentai[i].n / 2] + Studentai[i].nd[(Studentai[i].n - 1) / 2]) / 2.0) + 0.6 * Studentai[i].egz;
         }
 
-        // Input validation for the user's choice
+        // Pasirinkimas tarp vidurkio ir medianos
         string choiceInput;
         do {
             cout << "\nKa norite spausdinti: (1 - Galutinis(Vid.), 2 - Galutinis(med.))" << endl;
@@ -130,7 +125,7 @@ int main() {
 
         int choice = stoi(choiceInput);
 
-        // Beautiful cout with Vardas, Pavarde, Galutinis, and Galutinis(med.) for all students
+        // Lenteles isvedimas
         cout << "\nInformacija apie studentus:\n";
         cout << "--------------------------------------------------------------------------------------\n";
         cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << (choice == 1 ? "Galutinis(Vid.)" : "Galutinis(med.)") << endl;
