@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <ctime> // for generating random values
+#include <limits>
 
 using namespace std;
 
@@ -283,9 +284,17 @@ int main() {
         cout << "1. Ivesti viska rankomis\n";
         cout << "2. Generuoti pazymius\n";
         cout << "3. Generuoti ir pazymius ir studentu vardus, pavardes\n";
-        cout << "4. baigti darba\n";
+        cout << "4. Baigti darba\n";
         cout << "Rinktis (1-4): ";
         cin >> choice;
+
+        // Validate the input for choice
+        if (cin.fail()) {
+            cout << "Netinkama įvestis. Pasirinkite skaičių nuo 1 iki 4." << endl;
+            cin.clear(); // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            continue; // Skip the rest of the loop and start again
+        }
 
         switch (choice) {
             case 1:
