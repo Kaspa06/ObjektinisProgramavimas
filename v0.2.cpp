@@ -238,7 +238,7 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
     }
 }
 
-void readFromFile() {
+void readDataFromFile() {
     string fileName = "kursiokai.txt";
     ifstream inputFile(fileName);
 
@@ -258,15 +258,14 @@ void readFromFile() {
             }
         }
 
-        for (int i = 0; i < 15; ++i) {
-            if (!(inputFile >> student.nd[i])) {
-                cerr << "Error reading grade " << i + 1 << " for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
-                break;
-            }
+        int grade;
+        while (inputFile >> grade) {
+            student.nd.push_back(grade);
         }
 
         if (inputFile.fail()) {
-            cerr << "Error reading exam result for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
+            cerr << "Error reading grades or exam result for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
+            cerr << "Input format might be incorrect. Please check the file format." << endl;
             break;
         }
 
@@ -277,7 +276,10 @@ void readFromFile() {
     }
 
     inputFile.close();
+    ChoosePrint();
 }
+
+
 
 int main() {
 
@@ -314,7 +316,7 @@ switch (choice) {
                 break;
 
             case 4:
-                readFromFile(); // Add the new option to read data from file
+                readDataFromFile(); // Add the new option to read data from file
                 ChoosePrint();
                 break;
 
