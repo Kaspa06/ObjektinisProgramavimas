@@ -5,6 +5,7 @@
 #include <ctime>
 #include <vector>
 #include <limits>
+#include <fstream>
 
 using namespace std;
 
@@ -237,6 +238,46 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
     }
 }
 
+void readFromFile() {
+    string fileName = "kursiokai.txt";
+    ifstream inputFile(fileName);
+
+    if (!inputFile.is_open()) {
+        cerr << "Unable to open file: " << fileName << endl;
+        return;
+    }
+
+    while (true) {
+        Student student;
+        if (!(inputFile >> student.Vardas >> student.Pavarde)) {
+            if (inputFile.eof()) {
+                break;  // End of file
+            } else {
+                cerr << "Error reading student information from file." << endl;
+                break;
+            }
+        }
+
+        for (int i = 0; i < 15; ++i) {
+            if (!(inputFile >> student.nd[i])) {
+                cerr << "Error reading grade " << i + 1 << " for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
+                break;
+            }
+        }
+
+        if (inputFile.fail()) {
+            cerr << "Error reading exam result for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
+            break;
+        }
+
+        // Calculate results for each student individually
+        calculateResults(student);
+
+        Studentai.push_back(student);
+    }
+
+    inputFile.close();
+}
 
 int main() {
 
@@ -249,16 +290,17 @@ int main() {
         cout << "1. Ivesti viska rankomis\n";
         cout << "2. Generuoti pazymius\n";
         cout << "3. Generuoti ir pazymius ir studentu vardus, pavardes\n";
-        cout << "4. Baigti darba\n";
-        cout << "Rinktis (1-4): ";
+        cout << "4. Gauti studentu vardus, pavardes, pazymius is failo.\n";
+        cout << "5. Baigti darba\n";
+        cout << "Rinktis (1-5): ";
 
-        while (!(cin >> choice) || choice < 1 || choice > 4) {
-            cout << "Neteisinga ivestis. Pasirinkite skaiciu nuo 1 iki 4.\n";
+        while (!(cin >> choice) || choice < 1 || choice > 5) {
+            cout << "Neteisinga ivestis. Pasirinkite skaiciu nuo 1 iki 5.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
-        switch (choice) {
+switch (choice) {
             case 1:
                 writeEverythingWithHands();
                 break;
@@ -272,13 +314,18 @@ int main() {
                 break;
 
             case 4:
+                readFromFile(); // Add the new option to read data from file
+                ChoosePrint();
+                break;
+
+            case 5:
                 cout << "Programa uzdaroma!\n";
                 break;
 
             default:
-                cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 4.\n";
+                cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 5.\n";
         }
-    } while (choice != 4);
+    } while (choice != 5);
 
     return 0;
 }
