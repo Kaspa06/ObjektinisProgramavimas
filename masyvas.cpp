@@ -7,6 +7,9 @@
 
 using namespace std;
 
+const int MAX_STUDENTS = 100;
+const int MAX_GRADES = 10;
+
 string vardai[] = {"Jonas", "Petras", "Ona", "Maryte", "Antanas", "Jurga", "Kazys", "Rasa", "Darius", "Aiste"};
 string pavardes[] = {"Jonaitis", "Petraitis", "Onute", "Marytiene", "Antanaitis", "Jurgaite", "Kaziukas", "Rasiene", "Dariukas", "Aistyte"};
 
@@ -14,15 +17,14 @@ struct Student {
     string Vardas;
     string Pavarde;
     int n;
-    double nd[10];
+    double* nd;
     double egz;
     double galutinis;
     double galutinisMed;
     double vidurkis;
 };
 
-Student Studentai[100];
-int currentStudentIndex = 0;
+Student Studentai[MAX_STUDENTS];
 
 bool isPositiveInteger(const string& s) {
     return !s.empty() && all_of(s.begin(), s.end(), ::isdigit);
@@ -59,6 +61,8 @@ void inputStudentInfo(Student& student) {
 void inputGrades(Student& student) {
     double sum = 0;
     int j = 0;
+    student.nd = new double[MAX_GRADES];  // Dynamic memory allocation
+
     do {
         cout << "Iveskite " << j + 1 << " pazymi (nuo 1 iki 10, arba -1 jei norite baigti): ";
         string gradeInput;
@@ -109,7 +113,10 @@ void displayTable(int choice) {
     cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << (choice == 1 ? "Galutinis(Vid.)" : "Galutinis(med.)") << endl;
     cout << "--------------------------------------------------------------------------------------\n";
 
-    for (int i = 0; i < currentStudentIndex; ++i) {
+    for (int i = 0; i < MAX_STUDENTS; ++i) {
+        if (Studentai[i].Vardas.empty()) {
+            break;
+        }
         cout << setw(15) << Studentai[i].Vardas << setw(15) << Studentai[i].Pavarde
              << fixed << setprecision(2) << setw(20) << (choice == 1 ? Studentai[i].galutinis : Studentai[i].galutinisMed) << endl;
     }
@@ -158,8 +165,15 @@ void writeEverythingWithHands() {
         inputExamResult(student);
         calculateResults(student);
 
-        Studentai[currentStudentIndex] = student;
-        currentStudentIndex++;
+        for (int i = 0; i < MAX_STUDENTS; ++i) {
+            if (Studentai[i].Vardas.empty()) {
+                Studentai[i] = student;
+                break;
+            }
+        }
+
+        // Delete dynamic memory for the nd array
+        delete[] student.nd;
 
         string continueInput;
         inputContinue(continueInput);
@@ -178,6 +192,7 @@ void generateRandomGradeInput() {
         Student student;
         inputStudentInfo(student);
 
+        student.nd = new double[MAX_GRADES];  // Dynamic memory allocation
         int numGrades = rand() % 10 + 1;
         for (int j = 0; j < numGrades; ++j) {
             student.nd[j] = rand() % 10 + 1;
@@ -188,8 +203,15 @@ void generateRandomGradeInput() {
 
         calculateResults(student);
 
-        Studentai[currentStudentIndex] = student;
-        currentStudentIndex++;
+        for (int i = 0; i < MAX_STUDENTS; ++i) {
+            if (Studentai[i].Vardas.empty()) {
+                Studentai[i] = student;
+                break;
+            }
+        }
+
+        // Delete dynamic memory for the nd array
+        delete[] student.nd;
 
         string continueInput;
         inputContinue(continueInput);
@@ -217,22 +239,29 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
 
     try {
         for (int i = 0; i < mokiniuSk; i++) {
-            Studentai[currentStudentIndex].Vardas = vardai[rand() % (sizeof(vardai) / sizeof(vardai[0]))];
-            Studentai[currentStudentIndex].Pavarde = pavardes[rand() % (sizeof(pavardes) / sizeof(pavardes[0]))];
-            Studentai[currentStudentIndex].n = rand() % 10 + 1;
+            Studentai[i].Vardas = vardai[rand() % (sizeof(vardai) / sizeof(vardai[0]))];
+            Studentai[i].Pavarde = pavardes[rand() % (sizeof(pavardes) / sizeof(pavardes[0]))];
+            Studentai[i].n = rand() % 10 + 1;
 
-            for (int j = 1; j <= Studentai[currentStudentIndex].n; j++) {
-                Studentai[currentStudentIndex].nd[j - 1] = rand() % 10 + 1;
-                sum += Studentai[currentStudentIndex].nd[j - 1];
+            Studentai[i].nd = new double[MAX_GRADES];  // Dynamic memory allocation
+            for (int j = 1; j <= Studentai[i].n; j++) {
+                Studentai[i].nd[j - 1] = rand() % 10 + 1;
+                sum += Studentai[i].nd[j - 1];
             }
-            Studentai[currentStudentIndex].egz = rand() % 10 + 1;
+            Studentai[i].egz = rand() % 10 + 1;
 
-            calculateResults(Studentai[currentStudentIndex]);
-            currentStudentIndex++;
+            // Calculate results for each student individually
+            calculateResults(Studentai[i]);
         }
         ChoosePrint();
     } catch (const exception& e) {
         cerr << "Klaida: " << e.what() << endl;
+    }
+}
+
+void deleteDynamicArrays() {
+    for (int i = 0; i < MAX_STUDENTS; ++i) {
+        delete[] Studentai[i].nd;
     }
 }
 
@@ -277,6 +306,9 @@ int main() {
                 cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 4.\n";
         }
     } while (choice != 4);
+
+    // Clean up dynamic memory
+    deleteDynamicArrays();
 
     return 0;
 }
