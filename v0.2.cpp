@@ -97,7 +97,6 @@ void inputExamResult(Student& student) {
 
 void calculateResults(Student& student) {
     student.galutinis = 0.4 * student.vidurkis + 0.6 * student.egz;
-
     int n = student.n;
     student.galutinisMed = (n % 2 == 0) ?
         0.4 * (student.nd[n / 2 - 1] + student.nd[n / 2]) + 0.6 * student.egz :
@@ -241,13 +240,45 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
 void readDataFromFile() {
     string fileName = "kursiokai.txt";
     ifstream inputFile(fileName);
-
+    int x = 0;
+    
     if (!inputFile.is_open()) {
         cerr << "Unable to open file: " << fileName << endl;
         return;
     }
 
-    while (true) {
+    string headlineris;
+    getline(inputFile, headlineris);
+
+    while(!inputFile.eof()) {
+        string temp;
+        if(!getline(inputFile, temp)) {
+            cerr << "Unable to read file: " << fileName << endl;
+            break;
+        }
+
+        stringstream eil(temp);
+        vector <string> zodziai;
+
+        while(eil) {
+            if(!getline(eil, temp, ' ')) break;
+            if(temp.size() > 0) zodziai.push_back(temp);
+        }
+        x++;
+        Student student;
+        student.Vardas = zodziai[0];
+        student.Pavarde = zodziai[1];
+
+        for(int i = 2; i < zodziai.size(); i++) {
+            student.nd.push_back(stod(zodziai[i]));
+        }
+        student.n = x;
+        calculateResults(student);
+
+        Studentai.push_back(student);
+    }
+
+    /*while (true) {
         Student student;
         if (!(inputFile >> student.Vardas >> student.Pavarde)) {
             if (inputFile.eof()) {
@@ -273,7 +304,7 @@ void readDataFromFile() {
         calculateResults(student);
 
         Studentai.push_back(student);
-    }
+    }*/
 
     inputFile.close();
     ChoosePrint();
