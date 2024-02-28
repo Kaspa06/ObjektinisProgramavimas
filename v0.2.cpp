@@ -274,6 +274,8 @@ void readDataFromFile() {
         return;
     }
 
+    vector<Student> tempStudentai;  // Temporary vector for sorting
+
     while (true) {
         string line;
         if (!(getline(inputFile, line))) {
@@ -300,21 +302,60 @@ void readDataFromFile() {
         }
 
         calculateResults(student, 1);  // Calculate using the average (method 1) by default
-        double median = calculateMedian(student.nd);
+        student.galutinisMed = calculateMedian(student.nd);
 
-        // Print both average and median
-        cout << "Vardas: " << student.Vardas << ", Pavarde: " << student.Pavarde
-             << ", Galutinis(Vid.): " << fixed << setprecision(2) << student.galutinis
-             << ", Galutinis(Med.): " << fixed << setprecision(2) << median << endl;
-
-        Studentai.push_back(student);
+        tempStudentai.push_back(student);
     }
 
+    // Ask the user how they want to sort the data
+    int sortCriteria;
+    cout << "Select sorting criteria (1 - Vardas, 2 - Pavarde, 3 - Galutinis(Vid.), 4 - Galutinis(Med.)): ";
+    cin >> sortCriteria;
+
+    // Sort the data based on the selected criteria
+    switch (sortCriteria) {
+        case 1:
+            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
+                return a.Vardas < b.Vardas;
+            });
+            break;
+        case 2:
+            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
+                return a.Pavarde < b.Pavarde;
+            });
+            break;
+        case 3:
+            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
+                return a.galutinis < b.galutinis;
+            });
+            break;
+        case 4:
+            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
+                return a.galutinisMed < b.galutinisMed;
+            });
+            break;
+        default:
+            cout << "Invalid sorting criteria. Exiting." << endl;
+            return;
+    }
+
+    // Print the sorted data with Vardas, Pavarde, average, and median
+    cout << "\nSorted data:\n";
+    cout << "--------------------------------------------------------------------------------------\n";
+    cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis(Vid.)" << setw(15) << "Galutinis(Med.)" << endl;
+    cout << "--------------------------------------------------------------------------------------\n";
+
+    for (const auto& student : tempStudentai) {
+    cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
+         << std::fixed << std::setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
+}
+
+
     inputFile.close();
-    cout << "Data reading successful:)" << endl;
-    Studentai.shrink_to_fit();
-    cout << "Vector capacity: " << Studentai.capacity() << endl;
-    cout << "Vector size: " << Studentai.size() << endl;
+    cout << "Data reading and printing successful:)\n";
+    tempStudentai.shrink_to_fit();
+    cout << "Vector capacity: " << tempStudentai.capacity() << endl;
+    cout << "Vector size: " << tempStudentai.size() << endl;
 }
 
 int main() {
@@ -337,30 +378,30 @@ int main() {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
-        switch (choice) {
-            case 1:
-                writeEverythingWithHands();
-                break;
+ switch (choice) {
+        case 1:
+            writeEverythingWithHands();
+            break;
 
-            case 2:
-                generateRandomGradeInput();
-                break;
+        case 2:
+            generateRandomGradeInput();
+            break;
 
-            case 3:
-                generateRandomStudentData(mokiniuSk, 0);
-                break;
+        case 3:
+            generateRandomStudentData(mokiniuSk, 0);
+            break;
 
-            case 4:
-                readDataFromFile(); // Add the new option to read data from file
-                break;
+        case 4:
+            readDataFromFile();
+            break;
 
-            case 5:
-                cout << "Programa uzdaroma!\n";
-                break;
+        case 5:
+            cout << "Programa uzdaroma!\n";
+            break;
 
-            default:
-                cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 5.\n";
-        }
+        default:
+            cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 5.\n";
+    }
     } while (choice != 5);
 
     return 0;
