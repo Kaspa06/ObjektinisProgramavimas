@@ -6,6 +6,8 @@
 #include <vector>
 #include <limits>
 #include <fstream>
+#include <cmath>
+#include <numeric>
 
 using namespace std;
 
@@ -39,7 +41,7 @@ bool isValidDouble(const string& s, double minValue, double maxValue) {
 }
 
 bool isValidChoice(const string& s) {
-    return s == "1" || s == "2" || s == "3" || s == "4";
+    return s == "1" || s == "2" || s == "3" || s == "4" || s == "5";
 }
 
 bool isValidGrade(const string& s) {
@@ -95,13 +97,23 @@ void inputExamResult(Student& student) {
     student.egz = stod(egzInput);
 }
 
-void calculateResults(Student& student) {
-    student.galutinis = 0.4 * student.vidurkis + 0.6 * student.egz;
-    int n = student.n;
-    student.galutinisMed = (n % 2 == 0) ?
-        0.4 * (student.nd[n / 2 - 1] + student.nd[n / 2]) + 0.6 * student.egz :
-        0.4 * student.nd[n / 2] + 0.6 * student.egz;
+void calculateResults(Student& student, int calculationMethod) {
+    if (calculationMethod == 1) {
+        if (student.n > 0) {
+            double sum = accumulate(student.nd.begin(), student.nd.end(), 0.0);
+            student.vidurkis = sum / student.n;
+        } else {
+            student.vidurkis = 0.0;
+        }
+        student.galutinis = 0.4 * student.vidurkis + 0.6 * student.egz;
+    } else {
+        sort(student.nd.begin(), student.nd.end());
+        student.galutinisMed = (student.n % 2 == 0) ?
+            0.4 * (student.nd[student.n / 2 - 1] + student.nd[student.n / 2]) + 0.6 * student.egz :
+            0.4 * student.nd[student.n / 2] + 0.6 * student.egz;
+    }
 }
+
 
 void displayTable(int choice) {
     cout << "\nInformacija apie studentus:\n";
@@ -116,19 +128,20 @@ void displayTable(int choice) {
     Studentai.clear();
 }
 
-void ChoosePrint()
-{
+void ChoosePrint() {
     string choiceInput;
-        do {
-        cout << "\nKa norite spausdinti: (1 - Galutinis(Vid.), 2 - Galutinis(med.))" << endl;
+    do {
+        cout << "\nKa norite spausdinti: (1 - Galutinis(Vid.), 2 - Galutinis(med.), 5 - Baigti)" << endl;
         cin >> choiceInput;
         if (!isValidChoice(choiceInput)) {
-            cout << "Netinkama ivestis. Pasirinkite 1 arba 2." << endl;
+            cout << "Netinkama ivestis. Pasirinkite 1, 2 arba 5." << endl;
         }
     } while (!isValidChoice(choiceInput));
 
     int choice = stoi(choiceInput);
-    displayTable(choice);
+    if (choice != 5) {
+        displayTable(choice);
+    }
 }
 
 void inputContinue(string &continueInput) {
@@ -157,7 +170,7 @@ void writeEverythingWithHands() {
         inputStudentInfo(student);
         inputGrades(student);
         inputExamResult(student);
-        calculateResults(student);
+        calculateResults(student, 1);
 
         Studentai.push_back(student);
 
@@ -186,7 +199,7 @@ void generateRandomGradeInput() {
 
         student.egz = rand() % 10 + 1;
 
-        calculateResults(student);
+        calculateResults(student, 1);
 
         Studentai.push_back(student);
 
@@ -229,7 +242,7 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
             Studentai[i].egz = rand() % 10 + 1;
 
             // Calculate results for each student individually
-            calculateResults(Studentai[i]);
+            calculateResults(Studentai[i], 1);
         }
         ChoosePrint();
     } catch (const exception& e) {
@@ -237,84 +250,75 @@ void generateRandomStudentData(int mokiniuSk, int sum) {
     }
 }
 
+double calculateMedian(vector<double>& grades) {
+    size_t size = grades.size();
+    if (size == 0) {
+        return 0.0;
+    }
+
+    sort(grades.begin(), grades.end());
+
+    return (size % 2 == 0) ? (grades[size / 2 - 1] + grades[size / 2]) / 2.0 : grades[size / 2];
+}
+
 void readDataFromFile() {
-    string fileName = "kursiokai.txt";
+    system("dir *.txt");
+
+    string fileName;
+    cout << "Enter the file name to read data from: ";
+    cin >> fileName;
+
     ifstream inputFile(fileName);
-    int x = 0;
-    
-    if (!inputFile.is_open()) {
-        cerr << "Unable to open file: " << fileName << endl;
+    if (!inputFile) {
+        cout << "Failed to open the file: " << fileName << endl;
         return;
     }
 
-    string headlineris;
-    getline(inputFile, headlineris);
-
-    while(!inputFile.eof()) {
-        string temp;
-        if(!getline(inputFile, temp)) {
-            cerr << "Unable to read file: " << fileName << endl;
+    while (true) {
+        string line;
+        if (!(getline(inputFile, line))) {
             break;
         }
 
-        stringstream eil(temp);
-        vector <string> zodziai;
-
-        while(eil) {
-            if(!getline(eil, temp, ' ')) break;
-            if(temp.size() > 0) zodziai.push_back(temp);
-        }
-        x++;
+        istringstream iss(line);
         Student student;
-        student.Vardas = zodziai[0];
-        student.Pavarde = zodziai[1];
 
-        for(int i = 2; i < zodziai.size(); i++) {
-            student.nd.push_back(stod(zodziai[i]));
+        if (!(iss >> student.Vardas >> student.Pavarde)) {
+            cerr << "Failed to read Vardas and Pavarde." << endl;
+            continue;
         }
-        student.n = x;
-        calculateResults(student);
+
+        double grade;
+        student.nd.clear();
+        while (iss >> grade) {
+            student.nd.push_back(grade);
+        }
+
+        if (!student.nd.empty()) {
+            student.egz = student.nd.back();
+            student.nd.pop_back();
+        }
+
+        calculateResults(student, 1);  // Calculate using the average (method 1) by default
+        double median = calculateMedian(student.nd);
+
+        // Print both average and median
+        cout << "Vardas: " << student.Vardas << ", Pavarde: " << student.Pavarde
+             << ", Galutinis(Vid.): " << fixed << setprecision(2) << student.galutinis
+             << ", Galutinis(Med.): " << fixed << setprecision(2) << median << endl;
 
         Studentai.push_back(student);
     }
 
-    /*while (true) {
-        Student student;
-        if (!(inputFile >> student.Vardas >> student.Pavarde)) {
-            if (inputFile.eof()) {
-                break;  // End of file
-            } else {
-                cerr << "Error reading student information from file." << endl;
-                break;
-            }
-        }
-
-        int grade;
-        while (inputFile >> grade) {
-            student.nd.push_back(grade);
-        }
-
-        if (inputFile.fail()) {
-            cerr << "Error reading grades or exam result for student " << student.Vardas << " " << student.Pavarde << " from file." << endl;
-            cerr << "Input format might be incorrect. Please check the file format." << endl;
-            break;
-        }
-
-        // Calculate results for each student individually
-        calculateResults(student);
-
-        Studentai.push_back(student);
-    }*/
-
     inputFile.close();
-    ChoosePrint();
+    cout << "Data reading successful:)" << endl;
+    Studentai.shrink_to_fit();
+    cout << "Vector capacity: " << Studentai.capacity() << endl;
+    cout << "Vector size: " << Studentai.size() << endl;
 }
-
-
 
 int main() {
 
-    int sum = 0;
     int mokiniuSk;
     int choice = 0;
 
@@ -333,7 +337,7 @@ int main() {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
 
-switch (choice) {
+        switch (choice) {
             case 1:
                 writeEverythingWithHands();
                 break;
@@ -343,12 +347,11 @@ switch (choice) {
                 break;
 
             case 3:
-                generateRandomStudentData(mokiniuSk, sum);
+                generateRandomStudentData(mokiniuSk, 0);
                 break;
 
             case 4:
                 readDataFromFile(); // Add the new option to read data from file
-                ChoosePrint();
                 break;
 
             case 5:
