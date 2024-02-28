@@ -312,7 +312,7 @@ void readDataFromFile() {
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;
     cout << "Time taken to read data from file: " << elapsed_time.count() << " seconds" << endl;
-    
+
     int sortCriteria;
     cout << "Select sorting criteria (1 - Vardas, 2 - Pavarde, 3 - Galutinis(Vid.), 4 - Galutinis(Med.)): ";
     cin >> sortCriteria;
@@ -344,25 +344,25 @@ void readDataFromFile() {
             return;
     }
 
-   // Print the sorted data with Vardas, Pavarde, average, and median
-cout << "\nSorted data:\n";
-cout << "--------------------------------------------------------------------------------------\n";
-cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis(Vid.)" << setw(15) << "Galutinis(Med.)" << endl;
-cout << "--------------------------------------------------------------------------------------\n";
 
-for (const auto& student : tempStudentai) {
-    cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
-         << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
-}
+    cout << "\nSorted data:\n";
+    cout << "--------------------------------------------------------------------------------------\n";
+    cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis(Vid.)" << setw(15) << "Galutinis(Med.)" << endl;
+    cout << "--------------------------------------------------------------------------------------\n";
+
+    for (const auto& student : tempStudentai) {
+        cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
+            << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
+    }
 
 
 
-    inputFile.close();
-    cout << "Data reading and printing successful:)\n";
-    tempStudentai.shrink_to_fit();
-    cout << "Vector capacity: " << tempStudentai.capacity() << endl;
-    cout << "Vector size: " << tempStudentai.size() << endl;
-}
+        inputFile.close();
+        cout << "Data reading and printing successful:)\n";
+        tempStudentai.shrink_to_fit();
+        cout << "Vector capacity: " << tempStudentai.capacity() << endl;
+        cout << "Vector size: " << tempStudentai.size() << endl;
+    }
 
 int main() {
 
