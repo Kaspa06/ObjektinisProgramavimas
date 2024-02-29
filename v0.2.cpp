@@ -321,22 +321,22 @@ void readDataFromFile() {
     switch (sortCriteria) {
         case 1:
             sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.Vardas < b.Vardas;
+                return a.Vardas > b.Vardas;
             });
             break;
         case 2:
             sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.Pavarde < b.Pavarde;
+                return a.Pavarde > b.Pavarde;
             });
             break;
         case 3:
             sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.galutinis < b.galutinis;
+                return a.galutinis > b.galutinis;
             });
             break;
         case 4:
             sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.galutinisMed < b.galutinisMed;
+                return a.galutinisMed > b.galutinisMed;
             });
             break;
         default:
@@ -344,7 +344,12 @@ void readDataFromFile() {
             return;
     }
 
-
+    int temp;
+    ofstream fr("rezultatai.txt");
+    cout<<"Ar norite isvesti i console (1) ar i atskira .txt faila(2)?"<<endl;
+    cin>>temp;
+    if (temp == 1)
+    {
     cout << "\nSorted data:\n";
     cout << "--------------------------------------------------------------------------------------\n";
     cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis(Vid.)" << setw(15) << "Galutinis(Med.)" << endl;
@@ -354,6 +359,15 @@ void readDataFromFile() {
         cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
             << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
     }
+    }
+    else if (temp==2) 
+    {
+        for (const auto& student : tempStudentai) {
+        fr << setw(15) << student.Vardas << setw(15) << student.Pavarde
+            << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
+    }
+    }
+    else cout<<"Neteisingai ivesti duomenys"<<endl;
 
 
 
