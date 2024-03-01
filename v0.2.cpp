@@ -269,7 +269,7 @@ int main() {
     }
 
     double vidurkis = visoLaikoSuma / testuSkaicius;
-    cout << "Keliu testu laiku vidurkis: " << vidurkis << " s" << endl;
+    cout << "Time average: " << vidurkis << " s" << endl;
 
     return 0;
 }
