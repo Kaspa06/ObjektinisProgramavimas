@@ -1,389 +1,228 @@
 #include <iostream>
-#include <iomanip>
-#include <algorithm>
-#include <stdexcept>
-#include <ctime>
 #include <vector>
+#include <string>
+#include <algorithm>
 #include <limits>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
 #include <fstream>
-#include <cmath>
-#include <numeric>
+#include <sstream>
 #include <chrono>
 
 using namespace std;
+using namespace chrono;
 
-string vardai[] = {"Jonas", "Petras", "Ona", "Maryte", "Antanas", "Jurga", "Kazys", "Rasa", "Darius", "Aiste"};
-string pavardes[] = {"Jonaitis", "Petraitis", "Onute", "Marytiene", "Antanaitis", "Jurgaite", "Kaziukas", "Rasiene", "Dariukas", "Aistyte"};
-
-struct Student {
-    string Vardas;
-    string Pavarde;
-    int n;
-    vector<double> nd;
-    double egz;
-    double galutinis;
-    double galutinisMed;
-    double vidurkis;
+struct Studentas {
+    string vardas;
+    string pavarde;
+    vector<int> nd;
+    int egzaminas;
 };
 
-vector<Student> Studentai;
-
-bool isPositiveInteger(const string& s) {
-    return !s.empty() && all_of(s.begin(), s.end(), ::isdigit);
-}
-
-bool isValidDouble(const string& s, double minValue, double maxValue) {
-    try {
-        double value = stod(s);
-        return value >= minValue && value <= maxValue;
-    } catch (const invalid_argument&) {
-        return false;
+double vidurkis(const vector<int>& nd) {
+    if(nd.empty()) return 0.0;
+    double suma = 0.0;
+    for (int pazymys : nd) {
+        suma += pazymys;
     }
+    return suma / nd.size();
 }
 
-bool isValidChoice(const string& s) {
-    return s == "1" || s == "2" || s == "3" || s == "4" || s == "5";
-}
-
-bool isValidGrade(const string& s) {
-    if (all_of(s.begin(), s.end(), ::isdigit)) {
-        int grade = stoi(s);
-        return grade >= 1 && grade <= 10;
-    }
-    return false;
-}
-
-void inputStudentInfo(Student& student) {
-    cout << "Iveskite Varda: ";
-    cin >> student.Vardas;
-    cout << "Iveskite Pavarde: ";
-    cin >> student.Pavarde;
-}
-
-void inputGrades(Student& student) {
-    double sum = 0;
-    int j = 0;
-    do {
-        cout << "Iveskite " << j + 1 << " pazymi (nuo 1 iki 10, arba -1 jei norite baigti): ";
-        string gradeInput;
-        cin >> gradeInput;
-
-        if (gradeInput == "-1") {
-            break;
-        }
-
-        if (!isValidGrade(gradeInput)) {
-            cout << "Netinkama ivestis. Iveskite skaiciu nuo 1 iki 10." << endl;
-        } else {
-            student.nd.push_back(stod(gradeInput));
-            sum += student.nd[j];
-            j++;
-        }
-    } while (true);
-
-    student.n = j;
-    student.vidurkis = sum / student.n;
-}
-
-void inputExamResult(Student& student) {
-    string egzInput;
-    do {
-        cout << "Iveskite egzamino rezultata: ";
-        cin >> egzInput;
-        if (!isValidDouble(egzInput, 1.0, 10.0)) {
-            cout << "Netinkama ivestis. Iveskite skaiciu nuo 1 iki 10." << endl;
-        }
-    } while (!isValidDouble(egzInput, 1.0, 10.0));
-
-    student.egz = stod(egzInput);
-}
-
-void calculateResults(Student& student, int calculationMethod) {
-    if (calculationMethod == 1) {
-        if (student.n > 0) {
-            double sum = accumulate(student.nd.begin(), student.nd.end(), 0.0);
-            student.vidurkis = sum / student.n;
-        } else {
-            student.vidurkis = 0.0;
-        }
-        student.galutinis = 0.4 * student.vidurkis + 0.6 * student.egz;
+double mediana(vector<int> nd) {
+    if(nd.empty()) return 0.0;
+    sort(nd.begin(), nd.end());
+    size_t dydis = nd.size();
+    if (dydis % 2 == 0) {
+        return (nd[dydis / 2 - 1] + nd[dydis / 2]) / 2.0;
     } else {
-        sort(student.nd.begin(), student.nd.end());
-        student.galutinisMed = (student.n % 2 == 0) ?
-            0.4 * (student.nd[student.n / 2 - 1] + student.nd[student.n / 2]) + 0.6 * student.egz :
-            0.4 * student.nd[student.n / 2] + 0.6 * student.egz;
+        return nd[dydis / 2];
     }
 }
 
-
-void displayTable(int choice) {
-    cout << "\nInformacija apie studentus:\n";
-    cout << "--------------------------------------------------------------------------------------\n";
-    cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << (choice == 1 ? "Galutinis(Vid.)" : "Galutinis(med.)") << endl;
-    cout << "--------------------------------------------------------------------------------------\n";
-
-    for (const auto& student : Studentai) {
-        cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
-             << fixed << setprecision(2) << setw(20) << (choice == 1 ? student.galutinis : student.galutinisMed) << endl;
-    }
-    Studentai.clear();
+bool sortByVardas(const Studentas& a, const Studentas& b){
+    return a.vardas < b.vardas;
 }
 
-void ChoosePrint() {
-    string choiceInput;
-    do {
-        cout << "\nKa norite spausdinti: (1 - Galutinis(Vid.), 2 - Galutinis(med.), 5 - Baigti)" << endl;
-        cin >> choiceInput;
-        if (!isValidChoice(choiceInput)) {
-            cout << "Netinkama ivestis. Pasirinkite 1, 2 arba 5." << endl;
-        }
-    } while (!isValidChoice(choiceInput));
-
-    int choice = stoi(choiceInput);
-    if (choice != 5) {
-        displayTable(choice);
-    }
+bool sortByPavarde(const Studentas& a, const Studentas& b){
+    return a.pavarde < b.pavarde;
 }
 
-void inputContinue(string &continueInput) {
-    do {
-        cout << "Ar norite ivesti kita studenta? (taip/ne): ";
-        cin >> continueInput;
+bool sortByVidurkis(const Studentas& a, const Studentas& b) {
+    double vidurkisA = 0.4 * vidurkis(a.nd) + 0.6 * a.egzaminas;
+    double vidurkisB = 0.4 * vidurkis(b.nd) + 0.6 * b.egzaminas;
+    return vidurkisA < vidurkisB;
+}
 
-        // Convert input to lowercase for case-insensitive comparison
-        transform(continueInput.begin(), continueInput.end(), continueInput.begin(), ::tolower);
+bool sortByMediana(const Studentas& a, const Studentas& b) {
+    double medianaA = 0.4 * mediana(a.nd) + 0.6 * a.egzaminas;
+    double medianaB = 0.4 * mediana(b.nd) + 0.6 * b.egzaminas;
+    return medianaA < medianaB;
+}
 
-        if (continueInput == "taip" || continueInput == "ne") {
+void PrintData(const vector<Studentas>& studentai, const string& isvedimoFailoVardas = "", int choice = 1){
+    ostream& out = isvedimoFailoVardas.empty() ? cout : *new ofstream(isvedimoFailoVardas);
+    vector<Studentas> SortedStudents = studentai;
+
+    switch (choice) {
+        case 1:
+            sort(SortedStudents.begin(), SortedStudents.end(), sortByVardas);
             break;
-        } else if (isdigit(continueInput[0])) {
-            // If the input starts with a digit, redirect to the question
-            cout << "Netinkama ivestis. Iveskite 'taip' arba 'ne'.\n";
-            continue;
-        } else {
-            cout << "Netinkama ivestis. Iveskite 'taip' arba 'ne'.\n";
-        }
-    } while (true);
-}
-
-void writeEverythingWithHands() {
-    do {
-        Student student;
-        inputStudentInfo(student);
-        inputGrades(student);
-        inputExamResult(student);
-        calculateResults(student, 1);
-
-        Studentai.push_back(student);
-
-        string continueInput;
-        inputContinue(continueInput);
-
-        if (continueInput != "taip") {
+        case 2:
+            sort(SortedStudents.begin(), SortedStudents.end(), sortByPavarde);
             break;
-        }
-
-    } while (true);
-
-    ChoosePrint();
-}
-
-void generateRandomGradeInput() {
-    do {
-        Student student;
-        inputStudentInfo(student);
-
-        int numGrades = rand() % 10 + 1;
-        for (int j = 0; j < numGrades; ++j) {
-            student.nd.push_back(rand() % 10 + 1);
-        }
-        student.n = numGrades;
-
-        student.egz = rand() % 10 + 1;
-
-        calculateResults(student, 1);
-
-        Studentai.push_back(student);
-
-        string continueInput;
-        inputContinue(continueInput);
-
-        if (continueInput != "taip") {
+        case 3:
+            sort(SortedStudents.begin(), SortedStudents.end(), sortByVidurkis);
             break;
-        }
+        case 4:
+            sort(SortedStudents.begin(), SortedStudents.end(), sortByMediana);
+            break;
+    }
 
-    } while (true);
+    out << fixed << setprecision(2);
+    out << "Studentu galutiniai balai:\n";
+    out << "----------------------------------------------------------------\n";
+    out << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << "Galutinis (Vid.)" << setw(20) << "Galutinis (Med.)\n";
+    out << "----------------------------------------------------------------\n";
 
-    ChoosePrint();
-}
+    for (const Studentas& studentas : SortedStudents) {
+        double galutinisVidurkis = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
+        double galutineMediana = 0.4 * mediana(studentas.nd) + 0.6 * studentas.egzaminas;
+        out << left << setw(15) << studentas.vardas << setw(15) << studentas.pavarde << setw(20) << galutinisVidurkis << setw(20) << galutineMediana << "\n";
+    }
+    out << "----------------------------------------------------------------\n";
 
-void generateRandomStudentData(int mokiniuSk, int sum) {
-    string mokiniuSkInput;
-    do {
-        cout << "Iveskite kiek bus mokiniu: ";
-        cin >> mokiniuSkInput;
-        if (!isPositiveInteger(mokiniuSkInput)) {
-            cout << "Netinkama ivestis. Iveskite teigiama sveika skaiciu." << endl;
-        }
-    } while (!isPositiveInteger(mokiniuSkInput));
-
-    mokiniuSk = stoi(mokiniuSkInput);
-
-    Studentai.resize(mokiniuSk);
-
-    try {
-        for (int i = 0; i < mokiniuSk; i++) {
-            Studentai[i].Vardas = vardai[rand() % (sizeof(vardai) / sizeof(vardai[0]))];
-            Studentai[i].Pavarde = pavardes[rand() % (sizeof(pavardes) / sizeof(pavardes[0]))];
-            Studentai[i].n = rand() % 10 + 1;
-
-            for (int j = 1; j <= Studentai[i].n; j++) {
-                Studentai[i].nd.push_back(rand() % 10 + 1);
-                sum += Studentai[i].nd[j - 1];
-            }
-            Studentai[i].egz = rand() % 10 + 1;
-
-            // Calculate results for each student individually
-            calculateResults(Studentai[i], 1);
-        }
-        ChoosePrint();
-    } catch (const exception& e) {
-        cerr << "Klaida: " << e.what() << endl;
+    if (!isvedimoFailoVardas.empty()) {
+        delete &out; 
     }
 }
 
-double calculateMedian(vector<double>& grades) {
-    size_t size = grades.size();
-    if (size == 0) {
-        return 0.0;
+void generateRandomGrades(Studentas& studentas) {
+    studentas.nd.resize(rand() % 10 + 1);
+    for (int& grade : studentas.nd) {
+        grade = rand() % 10 + 1;
     }
-
-    sort(grades.begin(), grades.end());
-
-    return (size % 2 == 0) ? (grades[size / 2 - 1] + grades[size / 2]) / 2.0 : grades[size / 2];
+    studentas.egzaminas = rand() % 10 + 1;
 }
 
-void readDataFromFile() {
-    auto start_time = std::chrono::high_resolution_clock::now();
+void generateRandomNamesAndGrades(Studentas& studentas) {
+    const char* vardai[] = {"Jonas", "Petras", "Ona", "Maryte", "Antanas", "Jurga", "Kazys", "Rasa", "Darius", "Aiste"};
+    const char* pavardes[] = {"Jonaitis", "Petraitis", "Onute", "Marytiene", "Antanaitis", "Jurgaite", "Kaziukas", "Rasiene", "Dariukas", "Aistyte"};
+    int vardasIndex = rand() % 5;
+    int pavardeIndex = rand() % 5;
+    studentas.vardas = vardai[vardasIndex];
+    studentas.pavarde = pavardes[pavardeIndex];
+    generateRandomGrades(studentas);
+}
+
+void manualInput(vector<Studentas>& studentai) {
+    char testi = 't';
+
+    while (testi == 't') {
+        Studentas naujasStudentas;
+
+        cout << "Iveskite studento varda: ";
+        getline(cin, naujasStudentas.vardas);
+
+        cout << "Iveskite studento pavarde: ";
+        getline(cin, naujasStudentas.pavarde);
+
+        int pazymys;
+        cout << "Iveskite namu darbu pazymius (0 norint baigti): ";
+        while (cin >> pazymys && pazymys != 0) {
+            naujasStudentas.nd.push_back(pazymys);
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        cout << "Iveskite egzamino rezultata: ";
+        cin >> naujasStudentas.egzaminas;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        studentai.push_back(naujasStudentas);
+
+        cout << "Ar norite ivesti dar viena studenta? (t/n): ";
+        cin >> testi;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
+
+void generateGradesOnly(vector<Studentas>& studentai) {
+    for (Studentas& studentas : studentai) {
+        studentas.nd.clear();
+        int ndKiekis = rand() % 10 + 1;
+        for (int i = 0; i < ndKiekis; ++i) {
+            studentas.nd.push_back(rand() % 10 + 1);
+        }
+        studentas.egzaminas = rand() % 10 + 1;
+    }
+}
+
+void readFileDataFromFile(vector<Studentas>& studentai, const string&failoVardas){
+    ifstream failas(failoVardas);
+    if (!failas.is_open()) {
+        cerr << "Nepavyko atidaryti failo: " << failoVardas << endl;
+        return;
+    }
+
+    Studentas studentas;
+    string eilute;
+    getline(failas, eilute);
+
+     while (getline(failas, eilute)) {
+        istringstream eilutesSrautas(eilute);
+        eilutesSrautas >> studentas.vardas >> studentas.pavarde;
+
+        int pazymys;
+        studentas.nd.clear();
+        while (eilutesSrautas >> pazymys && pazymys != -1) {
+            studentas.nd.push_back(pazymys);
+        }
+
+        studentas.egzaminas = pazymys;
+        studentai.push_back(studentas);
+    }
+
+    failas.close();
+}
+
+string pasirinktiFaila()
+{
     system("dir *.txt");
 
     string fileName;
     cout << "Enter the file name to read data from: ";
     cin >> fileName;
 
-    ifstream inputFile(fileName);
-    if (!inputFile) {
-        cout << "Failed to open the file: " << fileName << endl;
-        return;
-    }
+    return fileName;
+}
 
-    vector<Student> tempStudentai;  // Temporary vector for sorting
-
-    while (true) {
-        string line;
-        if (!(getline(inputFile, line))) {
-            break;
-        }
-
-        istringstream iss(line);
-        Student student;
-
-        if (!(iss >> student.Vardas >> student.Pavarde)) {
-            cerr << "Failed to read Vardas and Pavarde." << endl;
-            continue;
-        }
-
-        double grade;
-        student.nd.clear();
-        while (iss >> grade) {
-            student.nd.push_back(grade);
-        }
-
-        if (!student.nd.empty()) {
-            student.egz = student.nd.back();
-            student.nd.pop_back();
-        }
-
-        calculateResults(student, 1);  // Calculate using the average (method 1) by default
-        student.galutinisMed = calculateMedian(student.nd);
-
-        tempStudentai.push_back(student);
-    }
-
-    auto end_time = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_time = end_time - start_time;
-    cout << "Time taken to read data from file: " << elapsed_time.count() << " seconds" << endl;
-
-    int sortCriteria;
-    cout << "Select sorting criteria (1 - Vardas, 2 - Pavarde, 3 - Galutinis(Vid.), 4 - Galutinis(Med.)): ";
-    cin >> sortCriteria;
-
-    // Sort the data based on the selected criteria
-    switch (sortCriteria) {
-        case 1:
-            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.Vardas > b.Vardas;
-            });
-            break;
-        case 2:
-            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.Pavarde > b.Pavarde;
-            });
-            break;
-        case 3:
-            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.galutinis > b.galutinis;
-            });
-            break;
-        case 4:
-            sort(tempStudentai.begin(), tempStudentai.end(), [](const Student& a, const Student& b) {
-                return a.galutinisMed > b.galutinisMed;
-            });
-            break;
-        default:
-            cout << "Invalid sorting criteria. Exiting." << endl;
-            return;
-    }
-
-    int temp;
-    ofstream fr("rezultatai.txt");
-    cout<<"Ar norite isvesti i console (1) ar i atskira .txt faila(2)?"<<endl;
-    cin>>temp;
-    if (temp == 1)
-    {
-    cout << "\nSorted data:\n";
-    cout << "--------------------------------------------------------------------------------------\n";
-    cout << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(15) << "Galutinis(Vid.)" << setw(15) << "Galutinis(Med.)" << endl;
-    cout << "--------------------------------------------------------------------------------------\n";
-
-    for (const auto& student : tempStudentai) {
-        cout << setw(15) << student.Vardas << setw(15) << student.Pavarde
-            << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
-    }
-    }
-    else if (temp==2) 
-    {
-        for (const auto& student : tempStudentai) {
-        fr << setw(15) << student.Vardas << setw(15) << student.Pavarde
-            << fixed << setprecision(2) << setw(15) << student.galutinis << setw(15) << student.galutinisMed << endl;
-    }
-    }
-    else cout<<"Neteisingai ivesti duomenys"<<endl;
-
-
-
-        inputFile.close();
-        cout << "Data reading and printing successful:)\n";
-        tempStudentai.shrink_to_fit();
-        cout << "Vector capacity: " << tempStudentai.capacity() << endl;
-        cout << "Vector size: " << tempStudentai.size() << endl;
-    }
+int pasirinktiRusiavimoTipa() {
+    cout << "Pasirinkite rusiavimo buda:\n"
+         << "1 - Pagal varda\n"
+         << "2 - Pagal pavarde\n"
+         << "3 - Pagal vidurki\n"
+         << "4 - Pagal mediana\n"
+         << "Iveskite pasirinkima: ";
+    int choice;
+    cin >> choice;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    return choice;
+}
 
 int main() {
+    srand(static_cast<unsigned int>(time(nullptr)));
+    vector<Studentas> studentai;
+    int pasirinkimas = 0;
 
-    int mokiniuSk;
-    int choice = 0;
+    double visoLaikoSuma = 0.0;
+    int testuSkaicius = 0;
 
-    do {
+    vector<double> testuLaikai;
+
+    while (pasirinkimas != 5) {
+        auto start = chrono::high_resolution_clock::now();
+
         cout << "\nMenu:\n";
         cout << "1. Ivesti viska rankomis\n";
         cout << "2. Generuoti pazymius\n";
@@ -391,38 +230,46 @@ int main() {
         cout << "4. Gauti studentu vardus, pavardes, pazymius is failo.\n";
         cout << "5. Baigti darba\n";
         cout << "Rinktis (1-5): ";
+        cin >> pasirinkimas;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        while (!(cin >> choice) || choice < 1 || choice > 5) {
-            cout << "Neteisinga ivestis. Pasirinkite skaiciu nuo 1 iki 5.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        switch (pasirinkimas) {
+            case 1:
+                manualInput(studentai);
+                break;
+            case 2:
+                generateGradesOnly(studentai);
+                break;
+            case 3:
+                for (int i = 0; i < 5; ++i) {
+                    Studentas naujasStudentas;
+                    generateRandomNamesAndGrades(naujasStudentas);
+                    studentai.push_back(naujasStudentas);
+                }
+                break;
+            case 4:
+                {
+                    readFileDataFromFile(studentai, pasirinktiFaila());
+                    int choice = pasirinktiRusiavimoTipa();
+                    PrintData(studentai, "rezultatai.txt", choice);
+                    break;
+                }
+            case 5:
+                break;
         }
 
- switch (choice) {
-        case 1:
-            writeEverythingWithHands();
-            break;
-
-        case 2:
-            generateRandomGradeInput();
-            break;
-
-        case 3:
-            generateRandomStudentData(mokiniuSk, 0);
-            break;
-
-        case 4:
-            readDataFromFile();
-            break;
-
-        case 5:
-            cout << "Programa uzdaroma!\n";
-            break;
-
-        default:
-            cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 5.\n";
+        if (pasirinkimas != 5) {
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double> time = end - start;
+            double laikas = time.count();
+            cout << "Operacija uztruko: " << laikas << " s" << endl;
+            visoLaikoSuma += laikas;
+            testuSkaicius++;
+        }
     }
-    } while (choice != 5);
+
+    double vidurkis = visoLaikoSuma / testuSkaicius;
+    cout << "Keliu testu laiku vidurkis: " << vidurkis << " s" << endl;
 
     return 0;
 }
