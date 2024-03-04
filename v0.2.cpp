@@ -56,10 +56,16 @@ bool sortByVardas(const Studentas& a, const Studentas& b) {
 
 bool sortByPavarde(const Studentas& a, const Studentas& b) {
     if (a.pavarde.find("Pavarde") == 0 && b.pavarde.find("Pavarde") == 0) {
+        try {
         int num1 = stoi(a.pavarde.substr(6));
         int num2 = stoi(b.pavarde.substr(6));
         return num1 > num2;
-    }else return a.pavarde > b.pavarde;
+        } catch (const std::invalid_argument&) {
+            return a.vardas > b.vardas;
+        }
+    }else {
+        return a.pavarde > b.pavarde;
+    }
 }
 
 bool sortByVidurkis(const Studentas& a, const Studentas& b) {
@@ -94,8 +100,8 @@ void PrintData(const vector<Studentas>& studentai, const string& isvedimoFailoVa
     }
 
     out << fixed << setprecision(2);
-    out << "----------------------------------------------------------------\n";
-    out << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << "Galutinis (Vid.)" << setw(20) << "Galutinis (Med.)\n";
+    out << "----------------------------------------------------------------\n"<<endl;
+    out << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << "Galutinis (Vid.)" << setw(20) << "Galutinis (Med.)\n"<<endl;
     out << "----------------------------------------------------------------\n";
 
     for (const Studentas& studentas : SortedStudents) {
@@ -158,6 +164,7 @@ void manualInput(vector<Studentas>& studentai) {
         cin >> testi;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
+    PrintData(studentai, "rezultatai.txt", 1);
 }
 
 void generateGradesOnly(vector<Studentas>& studentai) {
@@ -169,6 +176,7 @@ void generateGradesOnly(vector<Studentas>& studentai) {
         }
         studentas.egzaminas = rand() % 10 + 1;
     }
+    PrintData(studentai, "rezultatai.txt", 1);
 }
 
 void readFileDataFromFile(vector<Studentas>& studentai, const string&failoVardas){
@@ -254,10 +262,14 @@ int main() {
                 generateGradesOnly(studentai);
                 break;
             case 3:
-                for (int i = 0; i < 5; ++i) {
+            int laik;
+            cout<<"Iveskite kieki, kiek norite sugeneruoti studentu:";
+            cin>>laik;
+                for (int i = 0; i < laik; ++i) {
                     Studentas naujasStudentas;
                     generateRandomNamesAndGrades(naujasStudentas);
                     studentai.push_back(naujasStudentas);
+                    PrintData(studentai, "rezultatai.txt", 1);
                 }
                 break;
             case 4:
