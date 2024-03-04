@@ -40,12 +40,26 @@ double mediana(vector<int> nd) {
     }
 }
 
-bool sortByVardas(const Studentas& a, const Studentas& b){
-    return a.vardas < b.vardas;
+bool sortByVardas(const Studentas& a, const Studentas& b) {
+    if (a.vardas.find("Vardas") == 0 && b.vardas.find("Vardas") == 0) {
+        try {
+            int num1 = stoi(a.vardas.substr(6));
+            int num2 = stoi(b.vardas.substr(6));
+            return num1 > num2;
+        } catch (const std::invalid_argument&) {
+            return a.vardas > b.vardas;
+        }
+    } else {
+        return a.vardas > b.vardas;
+    }
 }
 
-bool sortByPavarde(const Studentas& a, const Studentas& b){
-    return a.pavarde < b.pavarde;
+bool sortByPavarde(const Studentas& a, const Studentas& b) {
+    if (a.pavarde.find("Pavarde") == 0 && b.pavarde.find("Pavarde") == 0) {
+        int num1 = stoi(a.pavarde.substr(6));
+        int num2 = stoi(b.pavarde.substr(6));
+        return num1 > num2;
+    }else return a.pavarde > b.pavarde;
 }
 
 bool sortByVidurkis(const Studentas& a, const Studentas& b) {
@@ -80,7 +94,6 @@ void PrintData(const vector<Studentas>& studentai, const string& isvedimoFailoVa
     }
 
     out << fixed << setprecision(2);
-    out << "Studentu galutiniai balai:\n";
     out << "----------------------------------------------------------------\n";
     out << left << setw(15) << "Vardas" << setw(15) << "Pavarde" << setw(20) << "Galutinis (Vid.)" << setw(20) << "Galutinis (Med.)\n";
     out << "----------------------------------------------------------------\n";
@@ -269,7 +282,7 @@ int main() {
     }
 
     double vidurkis = visoLaikoSuma / testuSkaicius;
-    cout << "Time average: " << vidurkis << " s" << endl;
+    cout << "Keliu testu laiku vidurkis: " << vidurkis << " s" << endl;
 
     return 0;
 }
