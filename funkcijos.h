@@ -5,12 +5,11 @@
 #include <vector>
 #include <string>
 
-int mokiniuSk;
-
-void writeEverythingWithHands();
-void generateRandomGradeInput();
-void generateRandomStudentData(int mokiniuSk, int sum);
-void readDataFromFile();
-
+std::string pasirinktiFaila();
+int pasirinktiRusiavimoTipa();
+void PrintData(const std::vector<Studentas>& studentai, const std::string& isvedimoFailoVardas = "", int choice = 1);
+void manualInput(std::vector<Studentas>& studentai);
+void generateGradesOnly(std::vector<Studentas>& studentai);
+void readFileDataFromFile(std::vector<Studentas>& studentai, const std::string& failoVardas);
 
 #endif
