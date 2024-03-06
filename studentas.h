@@ -4,22 +4,16 @@
 #include <string>
 #include <vector>
 
-struct Student {
-    std::string Vardas;
-    std::string Pavarde;
-    int n;
-    std::vector<double> nd;
-    double egz;
-    double galutinis;
-    double galutinisMed;
-    double vidurkis;
+struct Studentas {
+    std::string vardas;
+    std::string pavarde;
+    std::vector<int> nd;
+    int egzaminas;
 };
 
-std::vector<Student> Studentai;
-
-void inputStudentInfo(Student& student);
-void inputGrades(Student& student);
-void inputExamResult(Student& student);
-void calculateResults(Student& student, int calculationMethod);
+double vidurkis(const std::vector<int>& nd);
+double mediana(std::vector<int> nd);
+void generateRandomGrades(Studentas& studentas);
+void generateRandomNamesAndGrades(Studentas& studentas);
 
 #endif
