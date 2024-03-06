@@ -1,25 +1,31 @@
-#include "studentas.h"
-#include "funkcijos.h"
 #include <iostream>
-#include <iomanip>
-#include <algorithm>
-#include <stdexcept>
-#include <ctime>
 #include <vector>
+#include <string>
+#include <algorithm>
 #include <limits>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
 #include <fstream>
-#include <cmath>
-#include <numeric>
+#include <sstream>
 #include <chrono>
 
 using namespace std;
+using namespace chrono;
 
 int main() {
+    srand(static_cast<unsigned int>(time(nullptr)));
+    vector<Studentas> studentai;
+    int pasirinkimas = 0;
 
-    int mokiniuSk;
-    int choice = 0;
+    double visoLaikoSuma = 0.0;
+    int testuSkaicius = 0;
 
-    do {
+    vector<double> testuLaikai;
+
+    while (pasirinkimas != 5) {
+        auto start = chrono::high_resolution_clock::now();
+
         cout << "\nMenu:\n";
         cout << "1. Ivesti viska rankomis\n";
         cout << "2. Generuoti pazymius\n";
@@ -28,37 +34,85 @@ int main() {
         cout << "5. Baigti darba\n";
         cout << "Rinktis (1-5): ";
 
-        while (!(cin >> choice) || choice < 1 || choice > 5) {
-            cout << "Neteisinga ivestis. Pasirinkite skaiciu nuo 1 iki 5.\n";
-            cin.clear();
+        cin >> pasirinkimas;
+        if (!cin.good()) {
+            cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number." << endl;
+            continue;
         }
 
- switch (choice) {
-        case 1:
-            writeEverythingWithHands();
-            break;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
 
-        case 2:
-            generateRandomGradeInput();
-            break;
+        switch (pasirinkimas) {
+            case 1:
+                try {
+                    manualInput(studentai);
+                    PrintData(studentai, "rezultatai.txt");
+                } catch (const std::exception& e) {
+                    std::cerr << "Ivedimo klaida: " << e.what() << '\n';
+                }
+                break;
+            case 2:
+                 try {
+                    generateGradesOnly(studentai);
+                } catch (const std::exception& e) {
+                    std::cerr << "Pazymiu generavimo klaida: " << e.what() << '\n';
+                }
+                break;
+            case 3:
+                int laik;
+                cout << "Iveskite kieki, kiek norite sugeneruoti studentu:";
+                cin >> laik;
+                if (!cin.good()) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid input. Please enter a number." << endl;
+                    continue;
+                }
 
-        case 3:
-            generateRandomStudentData(mokiniuSk, 0);
-            break;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the buffer
 
-        case 4:
-            readDataFromFile();
-            break;
+                try {     
+                    for (int i = 0; i < laik; ++i) {
+                        Studentas naujasStudentas;
+                        generateRandomNamesAndGrades(naujasStudentas);
+                        studentai.push_back(naujasStudentas);
+                        PrintData(studentai, "rezultatai.txt", 1);
+                    }
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "Studentu generavimo klaida: " << e.what() << '\n';
+                }
+                break;
+            case 4:
+                {
+                    try{               
+                        readFileDataFromFile(studentai, pasirinktiFaila());
+                        int choice = pasirinktiRusiavimoTipa();
+                        PrintData(studentai, "rezultatai.txt", choice);
+                    }
+                    catch(const std::exception& e){
+                        std::cerr << e.what() << '\n';
+                    }
+                    break;
+                }
+            case 5:
+                break;
+        }
 
-        case 5:
-            cout << "Programa uzdaroma!\n";
-            break;
-
-        default:
-            cout << "Neteisingas pasirinkimas. Rinkites nuo 1 iki 5.\n";
+        if (pasirinkimas != 5) {
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double> time = end - start;
+            double laikas = time.count();
+            cout << "Operacija uztruko: " << laikas << " s" << endl;
+            visoLaikoSuma += laikas;
+            testuSkaicius++;
+        }
     }
-    } while (choice != 5);
+
+    double vidurkis = visoLaikoSuma / testuSkaicius;
+    cout << "Keliu testu laiku vidurkis: " << vidurkis << " s" << endl;
 
     return 0;
 }
