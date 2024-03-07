@@ -11,5 +11,7 @@ void PrintData(const std::vector<Studentas>& studentai, const std::string& isved
 void manualInput(std::vector<Studentas>& studentai);
 void generateGradesOnly(std::vector<Studentas>& studentai);
 void readFileDataFromFile(std::vector<Studentas>& studentai, const std::string& failoVardas);
+void generateStudentFiles(const std::vector<int>& sizes);
+void rusiuotiStudentus(const std::vector<int>& sizes);
 
 #endif
