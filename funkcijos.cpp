@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -182,4 +183,107 @@ int pasirinktiRusiavimoTipa() {
     cin >> choice;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     return choice;
+}
+void generateStudentFiles(const std::vector<int> &sizes)
+{
+    for (int size : sizes)
+    {
+        std::string fileName = "studentai" + std::to_string(size) + ".txt";
+        std::ofstream outFile(fileName);
+
+        outFile << std::left << std::setw(15) << "Vardas" << std::setw(15) << "Pavarde";
+        for (int i = 1; i <= 15; ++i)
+        {
+            outFile << std::setw(10) << "ND" + std::to_string(i);
+        }
+        outFile << std::setw(10) << "Egz." << std::endl;
+
+        for (int i = 1; i <= size; i++)
+        {
+            outFile << std::left << std::setw(15) << "Vardas" + std::to_string(i)
+                    << std::setw(15) << "Pavarde" + std::to_string(i);
+            for (int j = 0; j < 15; j++)
+            {
+                outFile << std::setw(10) << (rand() % 10 + 1);
+            }
+            outFile << std::setw(10) << (rand() % 10 + 1);
+            outFile << std::endl;
+        }
+
+        outFile.close();
+    }
+}
+
+void rusiuotiStudentus(const std::vector<int>& sizes) {
+    for (size_t index = 0; index < sizes.size(); ++index) {
+        std::string fileName = "studentai" + std::to_string(sizes[index]) + ".txt";
+        std::ifstream inFile(fileName);
+
+        if (!inFile) {
+            std::cerr << "Nepavyko atidaryti failo: " << fileName << std::endl;
+            continue;
+        }
+
+        std::vector<Studentas> studentai, kietiakiai, vargsiukai;
+        Studentas tempStudentas;
+        std::string eilute;
+        std::getline(inFile, eilute); 
+
+        auto startRead = std::chrono::high_resolution_clock::now();
+
+        while (std::getline(inFile, eilute)) {
+            std::istringstream eiluteStream(eilute);
+            eiluteStream >> tempStudentas.vardas >> tempStudentas.pavarde;
+            tempStudentas.nd.clear();
+            int pazymys;
+
+            while (eiluteStream >> pazymys) {
+                tempStudentas.nd.push_back(pazymys);
+            }
+            
+            if (!tempStudentas.nd.empty()) {
+                tempStudentas.egzaminas = tempStudentas.nd.back();
+                tempStudentas.nd.pop_back();
+            }
+
+            studentai.push_back(tempStudentas);
+        }
+
+        inFile.close();
+
+        auto endRead = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsedRead = endRead - startRead;
+        std::cout << "Duomenu nuskaitymas is " << fileName << " uztruko: " << elapsedRead.count() << " sekundziu." << std::endl;
+
+        auto startSort = std::chrono::high_resolution_clock::now();
+
+        for (const auto& studentas : studentai) {
+            double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
+            if (galutinisBalas < 5.0) {
+                vargsiukai.push_back(studentas);
+            } else {
+                kietiakiai.push_back(studentas);
+            }
+        }
+
+        auto endSort = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsedSort = endSort - startSort;
+        std::cout << "Studentu rusiavimas uztruko: " << elapsedSort.count() << " sekundziu." << std::endl;
+
+        // Isvedimas i failus
+        std::ofstream kietiakiaiFile("kietiakiai.txt"), vargsiukaiFile("vargsiukai.txt");
+
+        for (const auto &studentas : kietiakiai) {
+            kietiakiaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+        }
+
+        for (const auto &studentas : vargsiukai) {
+            vargsiukaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+        }
+
+        kietiakiaiFile.close();
+        vargsiukaiFile.close();
+
+        std::cout << "Studentai is " << fileName << " buvo sekmingai isrusiuoti ir issaugoti i atitinkamus failus." << std::endl;
+    }
 }
