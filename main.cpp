@@ -1,7 +1,6 @@
 #include "studentas.h"
 #include "funkcijos.h"
 #include <iostream>
-#include <vector>
 #include <cstdlib>
 #include <ctime>
 #include <limits>
@@ -41,7 +40,7 @@ int main() {
         if (!cin.good()) {
             cin.clear(); 
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input. Please enter a number." << endl;
+            cout << "Neteisinga ivestis. Iveskite skaiciu." << endl;
             continue;
         }
 
@@ -70,12 +69,11 @@ int main() {
                 if (!cin.good()) {
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    cout << "Invalid input. Please enter a number." << endl;
+                    cout << "Neteisinga ivestis. Iveskite skaiciu." << endl;
                     continue;
                 }
 
                 cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the buffer
-
                 try {     
                     for (int i = 0; i < laik; ++i) {
                         Studentas naujasStudentas;
@@ -102,11 +100,19 @@ int main() {
                 }
             case 5:
                 {
+                   std::cout << "Pasirinkite, kuri studentu faila norite sugeneruoti:" << std::endl;
+                    for (size_t i = 0; i < sizes.size(); ++i)
+                    {
+                        std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                    }
+                    std::cout << "Pasirinkimas: ";
+                    size_t choice;
+                    std::cin >> choice;
                     auto startFileGeneration = std::chrono::high_resolution_clock::now();
-                    generateStudentFiles(sizes);
+                    generateStudentFiles(std::vector<int>{sizes[choice - 1]});
                     auto endFileGeneration = std::chrono::high_resolution_clock::now();
                     std::chrono::duration<double> elapsedFileGeneration = endFileGeneration - startFileGeneration;
-                    std::cout << "Failu generavimas uztruko: " << elapsedFileGeneration.count() << " sekundziu." << std::endl;
+                    std::cout << choice <<"Failo generavimas uztruko: " << elapsedFileGeneration.count() << " sekundziu." << std::endl;
                     break;
                 }
             case 6:
@@ -143,7 +149,7 @@ int main() {
                 break;
         }
 
-        if (pasirinkimas != 7) {
+         if (pasirinkimas != 7) {
             auto endOperation = chrono::high_resolution_clock::now();
             chrono::duration<double> timeOperation = endOperation - startOperation;
             double laikasOperation = timeOperation.count();
