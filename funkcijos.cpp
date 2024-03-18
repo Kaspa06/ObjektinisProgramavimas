@@ -4,8 +4,6 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
-#include <vector>
-#include <string>
 #include <sstream>
 #include <algorithm>
 #include <chrono>
@@ -192,7 +190,7 @@ void generateStudentFiles(const std::vector<int> &sizes)
         std::ofstream outFile(fileName);
 
         outFile << std::left << std::setw(15) << "Vardas" << std::setw(15) << "Pavarde";
-        for (int i = 1; i <= 15; ++i)
+        for (int i = 1; i <= 5; ++i)
         {
             outFile << std::setw(10) << "ND" + std::to_string(i);
         }
@@ -201,8 +199,8 @@ void generateStudentFiles(const std::vector<int> &sizes)
         for (int i = 1; i <= size; i++)
         {
             outFile << std::left << std::setw(15) << "Vardas" + std::to_string(i)
-                    << std::setw(15) << "Pavarde" + std::to_string(i);
-            for (int j = 0; j < 15; j++)
+                    << std::setw(15) << "Pavarde" + std::to_string(i) + " ";
+            for (int j = 0; j < 5; j++)
             {
                 outFile << std::setw(10) << (rand() % 10 + 1);
             }
@@ -255,7 +253,7 @@ void rusiuotiStudentus(const std::vector<int>& sizes) {
         std::chrono::duration<double> elapsedRead = endRead - startRead;
         std::cout << "Duomenu nuskaitymas is " << fileName << " uztruko: " << elapsedRead.count() << " sekundziu." << std::endl;
 
-        auto startSort = std::chrono::high_resolution_clock::now();
+       // auto startSort = std::chrono::high_resolution_clock::now();
 
         for (const auto& studentas : studentai) {
             double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
@@ -266,9 +264,9 @@ void rusiuotiStudentus(const std::vector<int>& sizes) {
             }
         }
 
-        auto endSort = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsedSort = endSort - startSort;
-        std::cout << "Studentu rusiavimas uztruko: " << elapsedSort.count() << " sekundziu." << std::endl;
+        //auto endSort = std::chrono::high_resolution_clock::now();
+        //std::chrono::duration<double> elapsedSort = endSort - startSort;
+        //std::cout << "Studentu rusiavimas uztruko: " << elapsedSort.count() << " sekundziu." << std::endl;
 
         // Isvedimas i failus
         std::ofstream kietiakiaiFile("kietiakiai.txt"), vargsiukaiFile("vargsiukai.txt");
@@ -283,7 +281,5 @@ void rusiuotiStudentus(const std::vector<int>& sizes) {
 
         kietiakiaiFile.close();
         vargsiukaiFile.close();
-
-        std::cout << "Studentai is " << fileName << " buvo sekmingai isrusiuoti ir issaugoti i atitinkamus failus." << std::endl;
     }
 }
