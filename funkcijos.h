@@ -2,8 +2,6 @@
 #define FUNKCIJOS_H
 
 #include "studentas.h"
-#include <vector>
-#include <string>
 
 std::string pasirinktiFaila();
 int pasirinktiRusiavimoTipa();
