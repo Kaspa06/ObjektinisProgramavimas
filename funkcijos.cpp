@@ -222,7 +222,7 @@ void rusiuotiStudentus(const std::vector<int>& sizes) {
             continue;
         }
 
-        std::vector<Studentas> studentai, kietiakiai, vargsiukai;
+        std::vector<Studentas> studentai;
         Studentas tempStudentas;
         std::string eilute;
         std::getline(inFile, eilute); 
@@ -245,41 +245,50 @@ void rusiuotiStudentus(const std::vector<int>& sizes) {
             }
 
             studentai.push_back(tempStudentas);
+
+            // If fileName is "studentai10000000.txt" and the number of records reaches 1 million, process the chunk
+            if (fileName == "studentai10000000.txt" && studentai.size() == 1000000) {
+                processChunk(studentai);
+                studentai.clear();
+            }
         }
 
         inFile.close();
 
+        // Process any remaining records in the last chunk
+        if (!studentai.empty()) {
+            processChunk(studentai);
+        }
+
         auto endRead = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsedRead = endRead - startRead;
         std::cout << "Duomenu nuskaitymas is " << fileName << " uztruko: " << elapsedRead.count() << " sekundziu." << std::endl;
-
-       // auto startSort = std::chrono::high_resolution_clock::now();
-
-        for (const auto& studentas : studentai) {
-            double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
-            if (galutinisBalas < 5.0) {
-                vargsiukai.push_back(studentas);
-            } else {
-                kietiakiai.push_back(studentas);
-            }
-        }
-
-        //auto endSort = std::chrono::high_resolution_clock::now();
-        //std::chrono::duration<double> elapsedSort = endSort - startSort;
-        //std::cout << "Studentu rusiavimas uztruko: " << elapsedSort.count() << " sekundziu." << std::endl;
-
-        // Isvedimas i failus
-        std::ofstream kietiakiaiFile("kietiakiai.txt"), vargsiukaiFile("vargsiukai.txt");
-
-        for (const auto &studentas : kietiakiai) {
-            kietiakiaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
-        }
-
-        for (const auto &studentas : vargsiukai) {
-            vargsiukaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
-        }
-
-        kietiakiaiFile.close();
-        vargsiukaiFile.close();
     }
+}
+
+void processChunk(std::vector<Studentas>& studentai) {
+    std::vector<Studentas> kietiakiai, vargsiukai;
+
+    for (const auto& studentas : studentai) {
+        double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
+        if (galutinisBalas < 5.0) {
+            vargsiukai.push_back(studentas);
+        } else {
+            kietiakiai.push_back(studentas);
+        }
+    }
+
+    // Output to files
+    std::ofstream kietiakiaiFile("kietiakiai.txt"), vargsiukaiFile("vargsiukai.txt");
+
+    for (const auto &studentas : kietiakiai) {
+        kietiakiaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+    }
+
+    for (const auto &studentas : vargsiukai) {
+        vargsiukaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+    }
+
+    kietiakiaiFile.close();
+    vargsiukaiFile.close();
 }
