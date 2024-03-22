@@ -1,7 +1,11 @@
 Pirmasis bandymas: 115.4862 s.
+
 Antrasis bandymas: 126.9842 s.
+
 Trečiasis bandymas: 123.8751 s.
+
 Ketvirtasis bandymas: 119.9556 s.
+
 Penktasis bandymas: 120.6485 s. 
 
 Vidutinis greitis (sparta): 121.38992 s. 
