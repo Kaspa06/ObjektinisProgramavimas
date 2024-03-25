@@ -11,5 +11,7 @@ void generateGradesOnly(std::vector<Studentas>& studentai);
 void readFileDataFromFile(std::vector<Studentas>& studentai, const std::string& failoVardas);
 void generateStudentFiles(const std::vector<int>& sizes);
 void rusiuotiStudentus(const std::vector<int>& sizes);
+void rusiuotiStudentus2(const std::vector<int>& sizes);
+void rusiuotiStudentus3(const std::vector<int>& sizes);
 
 #endif
