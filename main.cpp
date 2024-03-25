@@ -140,8 +140,8 @@ int main() {
             case 7: {
                 std::cout << "Pasirinkite, kuri konteineri norite testuoti:" << std::endl;
                 std::cout << "1. Vector" << std::endl;
-                std::cout << "2. Deque" << std::endl;
-                std::cout << "3. List" << std::endl;
+                std::cout << "2. List" << std::endl;
+                std::cout << "3. Deque" << std::endl;
                 cin >> konteineris;
                 std::cout << "Pasirinkite, kuria strategija norite testuoti:" << std::endl;
                 std::cout << "1. Du tokio pacio tipo konteineriai" << std::endl;
@@ -219,11 +219,149 @@ int main() {
                         break;
                     }
                     case 2: {
-                        std::cout << "Pradedamas darbas su Deque tipo konteineriais" << endl;
+                        std::cout << "Pradedamas darbas su List tipo konteineriais" << endl;
+                        if(strategija == 1)
+                        {
+                            std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiList1(std::list<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl;
+                        }
+                        else if(strategija == 2)
+                        {
+                            std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiList2(std::list<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl;
+                        }
+                        else if(strategija == 3)
+                        {
+                           std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiList3(std::list<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl;     
+                        }
                         break;
                     }
                     case 3: {
-                        std::cout << "Pradedamas darbas su List tipo konteineriais" << endl;
+                        std::cout << "Pradedamas darbas su Deque tipo konteineriais" << endl;
+                        if(strategija == 1)
+                        {
+                            std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiDeque1(std::deque<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl; 
+                        }
+                        else if(strategija == 2)
+                        {
+                            std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiDeque2(std::deque<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl; 
+                        }
+                        else if(strategija == 3)
+                        {
+                            std::cout << "Pasirinkite, kuri studentu faila norite rusiuoti:" << std::endl;
+                            for (size_t i = 0; i < sizes.size(); ++i) {
+                                std::cout << i + 1 << " - studentai" << sizes[i] << ".txt" << std::endl;
+                            }
+                            std::cout << "Pasirinkimas: ";
+                            size_t choice;
+                            std::cin >> choice;
+
+                            if (std::cin.fail() || choice < 1 || choice > sizes.size()) {
+                                std::cerr << "Neteisingas pasirinkimas." << std::endl;
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                break;
+                            }
+
+                            auto startSorting = std::chrono::high_resolution_clock::now();
+                            rusiuotiDeque3(std::deque<int>{sizes[choice - 1]});
+                            auto endSorting = std::chrono::high_resolution_clock::now();
+                            std::chrono::duration<double> elapsedSorting = endSorting - startSorting;
+                            std::cout << "Rusiavimas ir issaugojimas uztruko: " << elapsedSorting.count() << " sekundziu." << std::endl; 
+                        }
                         break;
                     }
                 }
