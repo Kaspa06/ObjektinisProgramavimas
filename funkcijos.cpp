@@ -308,7 +308,7 @@ void rusiuotiStudentus2(const std::vector<int>& sizes) {
                 tempStudentas.nd.pop_back();
             }
 
-            studentai.push_back(tempStudentas);
+            studentai.emplace_back(std::move(tempStudentas)); // Use move semantics
         }
 
         inFile.close();
@@ -320,7 +320,7 @@ void rusiuotiStudentus2(const std::vector<int>& sizes) {
         for (auto it = studentai.begin(); it != studentai.end(); ) {
             double galutinisBalas = 0.4 * vidurkis(it->nd) + 0.6 * it->egzaminas;
             if (galutinisBalas < 5.0) {
-                vargsiukai.push_back(*it);
+                vargsiukai.push_back(std::move(*it)); // Use move semantics
                 it = studentai.erase(it);
             } else {
                 ++it;
@@ -329,21 +329,24 @@ void rusiuotiStudentus2(const std::vector<int>& sizes) {
 
         std::ofstream vargsiukaiFile("vargsiukai.txt");
 
-        for (const auto &studentas : vargsiukai) {
-            vargsiukaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+        for (auto& studentas : vargsiukai) {
+            double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
+            vargsiukaiFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << galutinisBalas << std::endl; 
         }
 
         vargsiukaiFile.close();
 
         std::ofstream outFile(fileName);
 
-        for (const auto &studentas : studentai) {
-            outFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas) << std::endl;
+        for (auto& studentas : studentai) {
+            double galutinisBalas = 0.4 * vidurkis(studentas.nd) + 0.6 * studentas.egzaminas;
+            outFile << studentas.vardas << " " << studentas.pavarde << " " << std::fixed << std::setprecision(2) << galutinisBalas << std::endl; 
         }
 
         outFile.close();
     }
 }
+
 
 void rusiuotiStudentus3(const std::vector<int>& sizes) {
     for (size_t index = 0; index < sizes.size(); ++index) {
@@ -405,7 +408,6 @@ void rusiuotiStudentus3(const std::vector<int>& sizes) {
             vargsiukaiFile << s.vardas << " " << s.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(s.nd) + 0.6 * s.egzaminas) << std::endl;
         });
 
-        // Write remaining students to outFile
         std::for_each(studentai.begin(), studentai.end(), [&outFile](const Studentas& s) {
             outFile << s.vardas << " " << s.pavarde << " " << std::fixed << std::setprecision(2) << (0.4 * vidurkis(s.nd) + 0.6 * s.egzaminas) << std::endl;
         });
